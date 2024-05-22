@@ -27,7 +27,7 @@ private:
     Node<T>* head;
     bool isDigit(const T& c);
     float convertToFloat(Node<T>*& current);
-    float evalElem(float left, Node<T>*& elem);
+    float evalElem(float left, Node<T>*& current);
 };
 
 

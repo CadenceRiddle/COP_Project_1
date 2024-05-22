@@ -46,6 +46,7 @@ float LinkedCalc<T>::evaluateExpression() {
     return evalElem(left, current);
 }
 
+//convert() eats up current Nodes until it points to nullptr or operator
 template <typename T>
 float LinkedCalc<T>::convertToFloat(Node<T>*& current) {
     float integ = 0, frac = 0;
@@ -64,30 +65,55 @@ float LinkedCalc<T>::convertToFloat(Node<T>*& current) {
         }
         
     }
-    return integ + frac;    //at this return, current is either nullptr or operator
+    return integ + frac;    //at this return, current is either nullptr or operator(by process of elimination)
 }
 
+//expected: left is left operand (either passed or calculated), current either points to nullptr or operator
 template <typename T>
 float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
     
-    if(!current) return left;
+    if(!current) return left;   //current is nullptr, end recursion
 
-    T op1 = current->data;
-    
+    T op1 = current->data;  //current is not nullptr, then current is operator followed by another operand
     current = current->next;
+
     float right = convertToFloat(current);
 
-    if(current) {   //second operator exists
-        
-    } else {
+    if(!current) {  //no second operator, end recursion
         if(op1 == '/') {
-
+            return left/right;
         } else if(op1 == '*') {
-
+            return left*right;
         } else if(op1 == '+') {
-
+            return left+right;
         } else if(op1 == '-') {
+            return left-right;
+        }
+    } else {   //second operator exists
+        T op2 = current->data;  //do not advance, preserve current pointing to operator
 
+        //  Order of operations: 1. Divide 2. Multiply 3. Add 4. Subtract
+        //All from left to right.
+        if(op1 == '/') {
+            return evalElem(left/right, current);
+        } else if(op1 == '*') {
+            if(op2 == '/') {
+                return left * evalElem(right, current);
+            } else {
+                return evalElem(left*right, current);
+            }
+        } else if(op1 == '+') {
+            if(op2 == '/' || op2 == '*') {
+                return left + evalElem(right, current);
+            } else {
+                return evalElem(left+right, current);
+            }
+        } else if(op1 == '-') {
+            if(op2 == '/' || op2 == '*' || op2 == '+') {
+                return left - evalElem(right, current);
+            } else {
+                return evalElem(left - right, current);
+            }
         }
     }
     return 0;
