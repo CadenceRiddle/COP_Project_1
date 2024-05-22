@@ -75,7 +75,7 @@ float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
     if(!current) return left;   //current is nullptr, end recursion
 
     T op1 = current->data;  //current is not nullptr, then current is operator followed by another operand
-    current = current->next;
+    current = current->next;    //read operator and advance
 
     float right = convertToFloat(current);
 
@@ -90,7 +90,7 @@ float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
             return left-right;
         }
     } else {   //second operator exists
-        T op2 = current->data;  //do not advance, preserve current pointing to operator
+        T op2 = current->data;  //read but do not advance, preserve current pointing to operator
 
         //  Order of operations: 1. Divide 2. Multiply 3. Add 4. Subtract
         //All from left to right.
