@@ -2,6 +2,7 @@
 #define LINKED_CALC_HPP
 
 #include <iostream>
+#include <cmath>    //used in convertToFloat
 
 // Node structure
 template <typename T>
@@ -26,6 +27,7 @@ private:
     Node<T>* head;
     bool isDigit(const T& c);
     float convertToFloat(Node<T>*& current);
+    float evalElem(float left, Node<T>*& current);
 };
 
 
