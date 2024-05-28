@@ -1,3 +1,10 @@
+/*
+Program that validates and evaluates a given expression in the form of a LinkedCalc class. 
+Modified from linked_calc.cpp and linked_calc.hpp provided in Project files.
+
+By Cadence Riddle and Sheng Rao
+*/
+
 #include "linked_calc.hpp"
 
 
@@ -83,6 +90,9 @@ bool LinkedCalc<T>::validateExpression() {
 
 
 // Function to evaluate the expression represented by the linked list
+// Starts the recursive function evalElem(), which should eat up the entire expression
+//and return the proper float.
+//A null/empty head returns 0.
 template <typename T>
 float LinkedCalc<T>::evaluateExpression() {
     Node<T>* current = head;
@@ -90,20 +100,21 @@ float LinkedCalc<T>::evaluateExpression() {
     return evalElem(left, current);
 }
 
-//convert() eats up current Nodes until it points to nullptr or operator
+//convertToFloat() eats up current Nodes until it points to nullptr or operator
+//if it is passed a nullptr as current, it returns 0.
 template <typename T>
 float LinkedCalc<T>::convertToFloat(Node<T>*& current) {
     float integ = 0, frac = 0;
-    int i = 1;
-    while(current && isDigit(current->data)) {
+    int i = 1;  //for evaluating frac
+    while(current && isDigit(current->data)) {  //while loop evaluates number as integer, read from left to right
         integ *= 10;
         integ += current->data - '0';
         current = current->next;
-    }   //after while, current is nullptr or nondigit
+    }   //after while ends, current is nullptr or nondigit
     if(!current) return integ;  //at this return, current is nullptr
     else if(current->data == '.') {
-        current = current->next;
-        while(current && isDigit(current->data)) {
+        current = current->next;    //eat the dot and advance
+        while(current && isDigit(current->data)) {  //while loop evaluates number as fractional part
             frac += (current->data - '0')/pow(10, i++);
             current = current->next;
         }
@@ -121,9 +132,10 @@ float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
     T op1 = current->data;  //current is not nullptr, then current is operator followed by another operand
     current = current->next;    //read operator and advance
 
-    float right = convertToFloat(current);
+    float right = convertToFloat(current);  //the only thing that can follow an operator is the right operand
 
-    if(!current) {  //no second operator, end recursion
+    // ^ after convertToFloat on right operand, current points to nullptr or an operator
+    if(!current) {  //no second operator, end recursion, return operated left/right
         if(op1 == '/') {
             return left/right;
         } else if(op1 == '*') {
@@ -156,10 +168,11 @@ float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
             if(op2 == '/' || op2 == '*' || op2 == '+') {
                 return left - evalElem(right, current);
             } else {
-                return evalElem(left - right, current);
+                return evalElem(left-right, current);
             }
         }
     }
+    //an uncovered case if it reaches this point (likely unknown operator), throw exception?
     return 0;
 }
 
