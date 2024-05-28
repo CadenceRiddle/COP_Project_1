@@ -46,7 +46,6 @@ bool LinkedCalc<T>::validateExpression() {
 
     Node<T>* curr = head;   //uses node to traverse list to find size of count
     while(curr!=nullptr){
-        int i = 0;
         count++;
         curr = curr->next;
     };
