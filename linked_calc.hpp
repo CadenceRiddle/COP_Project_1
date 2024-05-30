@@ -20,14 +20,15 @@ public:
     LinkedCalc();
     ~LinkedCalc();
     void insert(const T& value);
-    bool validateExpression();
-    float evaluateExpression();
+    bool validateExpression() const;
+    float evaluateExpression() const;
 
 private:
     Node<T>* head;
-    bool isDigit(const T& c);
-    float convertToFloat(Node<T>*& current);
-    float evalElem(float left, Node<T>*& current);
+    bool isDigit(const T& c) const;
+    bool isOpr(const T& c) const;
+    float convertToFloat(Node<T>*& current) const;
+    float evalElem(float left, Node<T>*& current) const;
 };
 
 

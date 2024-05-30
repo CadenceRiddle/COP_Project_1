@@ -41,50 +41,39 @@ void LinkedCalc<T>::insert(const T& value) {
 
 // Helper function to determine if a character is a digit
 template <typename T>
-bool LinkedCalc<T>::isDigit(const T& c) {
+bool LinkedCalc<T>::isDigit(const T& c) const {
     return (c >= '0' && c <= '9') ;
 }
 
+// Helper function to determine if a character is an operator
 template <typename T>
-bool LinkedCalc<T>::validateExpression() {
+bool LinkedCalc<T>::isOpr(const T& c) const {
+    return (c == '/' || c == '*' || c == '+' || c == '-') ;
+}
 
-
-    int count = 0;  //declares variable to determine size for dynamic array
-
-    Node<T>* curr = head;   //uses node to traverse list to find size of count
-    while(curr!=nullptr){
-        count++;
-        curr = curr->next;
-    };
-
-    T* arr = new T[count];  //uses the name node to create a new array to store the data of the list
-    curr = head;
-    for(int i = 0; i < count; i++){
-        arr[i] = curr->data;
-        curr = curr->next;
+template <typename T>
+bool LinkedCalc<T>::validateExpression() const {
+    Node<T>* current = head;
+    T curr;
+    bool radix = false;   
+    while(current != nullptr) {
+        curr = current->data;
+        if(isDigit(curr)) {
+            
+        } else if(isOpr(curr)) {
+            radix = false;  //reset two decimal points in a single operand flag
+            if(current->next == nullptr || !isDigit(current->next->data)) return false; //not a digit after an operator
+            if(isOpr(current->next->data)) return false;   //two consecutive operators
+        } else if(curr == '.') {
+            if(radix) return false; //two decimal points in a single operand, includes two in a row
+            radix = true;
+        } else return false; //not digit, operator, or decimal point
+        
+        current = current->next;
     }
 
-
-    if(count % 2 == 1){ //if the array length is even, then there is too many or too few operators and digits for an expression
-        for(int j = 0; j < count; j++){
-            if(j % 2 == 0){                 //since the digits occur every even index, if the index is even and not a number then it is not a valid expression
-                if(!isDigit(arr[j])){
-                    return false;
-                }
-            }
-            else{         //checks if the odd indexes are one of the following conditions
-                if(!(arr[j] == '+' || arr[j] == '-' || arr[j] == '*' || arr[j] == '/' || (arr[j] == '.' && isDigit(arr[j+1])))
-                ){
-                    return false;
-                }
-            }
-        }
-    }
-    else{
-        return false;
-    };
-
-    return true;    //returns true on default
+    
+    return true;    //all checks passed without failure, return true
 }   
 
 
@@ -94,7 +83,7 @@ bool LinkedCalc<T>::validateExpression() {
 //and return the proper float.
 //A null/empty head returns 0.
 template <typename T>
-float LinkedCalc<T>::evaluateExpression() {
+float LinkedCalc<T>::evaluateExpression() const {
     Node<T>* current = head;
     float left = convertToFloat(current);
     return evalElem(left, current);
@@ -103,7 +92,7 @@ float LinkedCalc<T>::evaluateExpression() {
 //convertToFloat() eats up current Nodes until it points to nullptr or operator
 //if it is passed a nullptr as current, it returns 0.
 template <typename T>
-float LinkedCalc<T>::convertToFloat(Node<T>*& current) {
+float LinkedCalc<T>::convertToFloat(Node<T>*& current) const {
     float integ = 0, frac = 0;
     int i = 1;  //for evaluating frac
     while(current && isDigit(current->data)) {  //while loop evaluates number as integer, read from left to right
@@ -125,7 +114,7 @@ float LinkedCalc<T>::convertToFloat(Node<T>*& current) {
 
 //expected: left is left operand (either passed or calculated), current either points to nullptr or operator
 template <typename T>
-float LinkedCalc<T>::evalElem(float left, Node<T>*& current) {
+float LinkedCalc<T>::evalElem(float left, Node<T>*& current) const {
     
     if(!current) return left;   //current is nullptr, end recursion
 
